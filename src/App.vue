@@ -11,7 +11,7 @@
 import Post from './components/Post.vue'
 import axios from 'axios'
 export default {
-  name: 'app',
+  name: 'Medium',
   components: {
     Post
   },
