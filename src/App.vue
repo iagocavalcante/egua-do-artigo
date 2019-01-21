@@ -24,7 +24,7 @@ export default {
   methods: {
     getArticle () {
       this.isLoad = false
-      axios.get(`api-postagens.herokuapp.com/api/medium/${this.name}/${this.postName}`)
+      axios.get(`https://api-postagens.herokuapp.com/api/medium/${this.name}/${this.postName}`)
         .then(response => {
           this.paragraphs = [...response.data]
           this.isLoad = true
