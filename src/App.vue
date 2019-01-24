@@ -1,8 +1,10 @@
 <template>
   <div id="app">
-    <input type="text" v-model="name">
-    <input type="text" v-model="postName">
-    <button @click="getArticle()">Ver artigo</button>
+    <div style="margin: 0 auto;">
+      <input type="text" placeholder="Nome do usuário sem @" v-model="name">
+      <input type="text" placeholder="Título do artigo que fica na url" v-model="postName">
+      <button @keydown.enter="getArticle()" @click="getArticle()">Ver artigo</button>
+    </div>
     <Post v-if="isLoad" :paragraphs="paragraphs"/>
   </div>
 </template>
