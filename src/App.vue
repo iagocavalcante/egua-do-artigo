@@ -412,7 +412,7 @@ pre {
 
 .box--input:focus {
   outline: none;
-  border-style: none;
+  border: 1px solid;
 }
 
 .box--button {
