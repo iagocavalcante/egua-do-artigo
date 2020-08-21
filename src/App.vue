@@ -136,9 +136,20 @@ blockquote {
 
 code {
   font-size: 18px;
-  background: rgba(0,0,0,.05);
   border-radius: 2px;
   padding: 3px 5px;
+  background: rgb(242, 242, 242) none repeat scroll 0% 0%;
+  padding: 20px;
+  color: rgb(41, 41, 41);
+}
+
+pre {
+  font-size: 18px;
+  border-radius: 2px;
+  padding: 3px 5px;
+  background: rgb(242, 242, 242) none repeat scroll 0% 0%;
+  padding: 20px;
+  color: rgb(41, 41, 41);
 }
 
 /* ##################################################################################
