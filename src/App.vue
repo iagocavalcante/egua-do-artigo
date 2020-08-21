@@ -55,8 +55,7 @@ export default {
       this.isLoading = true
       this.isLoaded = false
       try {
-        const { data } = await axios.get(`https://api-postagens.herokuapp.com/api/medium/${this.name}/${this.postName}`)
-        // const { data } = await axios.get(`http://localhost:3000/api/medium/${this.name}/${this.postName}`)
+        const { data } = await axios.get(`${process.env.VUE_APP_API_URL}${this.name}/${this.postName}`)
         this.paragraphs = [...data]
       } catch (error) {
         // eslint-disable-next-line no-console
