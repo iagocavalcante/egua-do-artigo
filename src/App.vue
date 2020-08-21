@@ -1,11 +1,32 @@
 <template>
   <div id="app">
-    <div style="margin: 0 auto;">
-      <input type="text" placeholder="Nome do usuário sem @" v-model="name">
-      <input type="text" placeholder="Título do artigo que fica na url" v-model="postName">
-      <button @keydown.enter="getArticle()" @click="getArticle()">Ver artigo</button>
+    <h1 v-if="!isLoaded" class="box--title">Égua do Artigo</h1>
+    <h4 v-if="!isLoaded" class="box--subtitle">
+      Com o <b>Égua do Artigo</b> você pode ler os artigos do **dium sem paywall,
+      é grátis e <a class="box--link" href="github.com/iagocavalcante/medium/" target="_blank">open source</a>.
+      Venha dar sugestões e ajude a evoluir!
+    </h4>
+    <div class="box" v-if="!isLoaded">
+      <img class="box--logo" :src="require('@/assets/freedium_logo.svg')" />
+      <input class="box--input" type="text" placeholder="Link do artigo" v-model="link">
+      <button :class="{
+        'box--button-loading': isLoading,
+        }"
+        :disabled="isLoading"
+        class="box--button"
+        @keydown.enter="getArticle()"
+        @click="getArticle()"
+      >
+        <slot v-if="!isLoading">Ler artigo</slot>
+        <span class="box--button-spinner">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
     </div>
-    <Post v-if="isLoad" :paragraphs="paragraphs"/>
+    <Post v-if="isLoaded" :paragraphs="paragraphs"/>
   </div>
 </template>
 
@@ -18,30 +39,44 @@ export default {
     Post
   },
   data: () => ({
-    name: '',
-    postName: '',
-    isLoad: false,
+    link: '',
+    name: 'shamnad.p.s',
+    postName: 'image-upload-to-aws-s3-using-nestjs-and-typescript-b32c079963e1',
+    isLoading: false,
+    isLoaded: false,
     paragraphs: []
   }),
   methods: {
-    getArticle () {
-      this.isLoad = false
-      axios.get(`https://api-postagens.herokuapp.com/api/medium/${this.name}/${this.postName}`)
-        .then(response => {
-          this.paragraphs = [...response.data]
-          this.isLoad = true
-        })
-        .catch(error => {
-          this.isLoad = true
-          console.log(error)
-        })
+    async getArticle () {
+      const re = /medium\.com\/(?<username>\S+)\/(?<title>\S+)/
+      const matchedRegex = this.link.match(re)
+      this.name = matchedRegex['groups'].username
+      this.postName = matchedRegex['groups'].title
+      this.isLoading = true
+      this.isLoaded = false
+      try {
+        // const { data } = await axios.get(`https://api-postagens.herokuapp.com/api/medium/${this.name}/${this.postName}`)
+        const { data } = await axios.get(`http://localhost:3000/api/medium/${this.name}/${this.postName}`)
+        this.paragraphs = [...data]
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error)
+      } finally {
+        this.isLoading = false
+        this.isLoaded = true
+      }
     }
   }
 }
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700|Lora|Playfair+Display:700i,900');
+
+* {
+  font-family: 'Inter', sans-serif;
+}
 
 html,
 body {
@@ -56,19 +91,17 @@ i,
 a,
 .first-letter,
 .authorName a {
-  color: rgba(0, 0, 0, 0.84);
+  color: #8d8db1;
   text-rendering: optimizeLegibility;
 }
 
 h1 {
-  font-family: "Playfair Display", serif;
   font-size: 48px;
   text-align: left;
   margin-bottom: 8px;
 }
 
 h2 {
-  font-family: "Lato", sans-serif;
   font-size: 26px;
   font-weight: 700;
   padding: 0;
@@ -80,7 +113,6 @@ h2 {
 
 p, i, a {
   margin-top: 21px;
-  font-family: "Lora";
   font-size: 21px;
   letter-spacing: -0.03px;
   line-height: 1.58;
@@ -108,119 +140,6 @@ code {
   background: rgba(0,0,0,.05);
   border-radius: 2px;
   padding: 3px 5px;
-}
-
-mark, .highlighted {
-  background: #7DFFB3;
-}
-
-.first-letter {
-  overflow-wrap: break-word;
-  font-family: "Playfair Display", serif;
-  font-size: 60px;
-  line-height: 60px;
-  display: block;
-  position: relative;
-  float: left;
-  margin: 0px 7px 0 -5px;
-}
-
-.subtitle {
-  font-family: "Lato", sans-serif;
-  color: rgba(0, 0, 0, 0.54);
-  margin: 0 0 24px 0;
-}
-
-::selection{background-color: lavender}
-
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Lora|Playfair+Display:700i,900');
-
-html,
-body {
-  margin: 0;
-  width: 100%;
-}
-
-h1,
-h2,
-p,
-i,
-a,
-.first-letter,
-.authorName a {
-  color: rgba(0, 0, 0, 0.84);
-  text-rendering: optimizeLegibility;
-}
-
-h1 {
-  font-family: "Playfair Display", serif;
-  font-size: 48px;
-  text-align: left;
-  margin-bottom: 8px;
-}
-
-h2 {
-  font-family: "Lato", sans-serif;
-  font-size: 26px;
-  font-weight: 700;
-  padding: 0;
-  margin: 56px 0 -13px -1.883px;
-  text-align: left;
-  line-height: 34.5px;
-  letter-spacing: -0.45px;
-}
-
-p, i, a {
-  margin-top: 21px;
-  font-family: "Lora";
-  font-size: 21px;
-  letter-spacing: -0.03px;
-  line-height: 1.58;
-}
-
-a {
-  text-decoration: underline;
-}
-
-blockquote {
-  font-family: "Playfair Display", serif;
-  font-size: 30px;
-  font-style: italic;
-  letter-spacing: -0.36px;
-  line-height: 44.4px;
-  overflow-wrap: break-word;
-  margin: 55px 0 33px 0;
-  /* text-align: center; */
-  color: rgba(0, 0, 0, 0.68);
-  padding: 0 0 0 50px;
-}
-
-code {
-  font-size: 18px;
-  background: rgba(0,0,0,.05);
-  border-radius: 2px;
-  padding: 3px 5px;
-}
-
-.highlighted {
-  background: #7DFFB3;
-}
-
-.first-letter {
-  overflow-wrap: break-word;
-  font-family: "Playfair Display", serif;
-  font-size: 60px;
-  line-height: 60px;
-  display: block;
-  position: relative;
-  float: left;
-  margin: 0px 7px 0 -5px;
-}
-
-.subtitle {
-  font-family: "Lato", sans-serif;
-  color: rgba(0, 0, 0, 0.54);
-  margin: 0 0 24px 0;
 }
 
 /* ##################################################################################
@@ -416,6 +335,164 @@ code {
   .footer {
     -ms-grid-row: 3;
     -ms-grid-column: 1;
+  }
+}
+
+#app {
+  display:table-cell;
+  vertical-align:middle;
+  height: 100vh;
+  width: 100vw;
+}
+
+.box {
+  display: flex;/* shrinks to fit content */
+  flex-direction: column;
+  width: 20rem;
+  margin: auto;
+}
+
+.box--title {
+  width: 22rem;
+  margin: auto;
+  padding: 1rem;
+  font-family: 'Inter', sans-serif;
+  color: #8d8db1;
+}
+
+.box--subtitle {
+  width: 35rem;
+  margin: auto;
+  font-family: 'Inter', sans-serif;
+  color: #8d8db1;
+  text-align: center;
+}
+
+.box--link {
+  font-size: 12pt;
+  font-family: 'Inter', sans-serif;
+  color: #8d8db1;
+}
+
+.box--logo {
+  margin: 1rem;
+  height: 12rem;
+}
+
+.box--input {
+  font-family: 'Inter', sans-serif;
+  margin: .7rem;
+  padding: 1.2rem;
+  font-size: 14pt;
+  color: #8d8db1;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 2px;
+}
+
+.box--input:focus {
+  outline: none;
+  border-style: none;
+}
+
+.box--button {
+  font-family: 'Inter', sans-serif;
+  margin: .7rem;
+  padding: 1.2rem;
+  font-size: 14pt;
+  color: #f2f2f2;
+  background-color: #8d8db1;
+  border: none;
+  border-radius: 2px;
+}
+
+.box--button:hover {
+  cursor: pointer;
+  color: #f2f2f2;
+  background-color: #8d8db1A6;
+}
+
+.box--button::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+.box--button:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+/* loading styles */
+.box--button {
+  position: relative;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+  transition-timing-function: ease-in;
+}
+.box--button-spinner {
+  position: relative;
+  justify-content: center;
+  opacity: 0;
+  transition-property: padding, opacity;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-in, ease;
+  transition-delay: 0s, 0.2s;
+}
+.box--button-spinner span {
+  box-sizing: border-box;
+  display: inline-block;
+  position: absolute;
+  width: 2.2rem;
+  height: 2.2rem;
+  opacity: 1;
+  border: 3.4px solid #f2f2f2;
+  border-radius: 50%;
+  animation: box--button-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #f2f2f2 transparent transparent transparent;
+}
+.box--button-spinner span:nth-child(1) {
+  animation-delay: 0.45s;
+}
+.box--button-spinner span:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.box--button-spinner span:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.box--button-loading {
+  padding-right: 3.5rem;
+}
+.box--button-loading .box--button-spinner {
+  opacity: 1;
+  padding: 1.2rem;
+}
+.box--button-loading .box--button-spinner span {
+  opacity: 1;
+}
+button:not(:disabled) {
+  transition-delay: 0.2s;
+}
+button:not(:disabled) .box--button-spinner span {
+  box-shadow: 0 0 0 0.2rem #f2f2f2 inset;
+  border: 7.4px solid transparent;
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+}
+button:not(:disabled) .box--button-spinner span:nth-child(1) {
+  transform: rotate(0deg);
+}
+button:not(:disabled) .box--button-spinner span:nth-child(2) {
+  transform: rotate(90deg);
+}
+button:not(:disabled) .box--button-spinner span:nth-child(3) {
+  transform: rotate(180deg);
+}
+button:not(:disabled) .box--button-spinner span:nth-child(4) {
+  transform: rotate(270deg);
+}
+@keyframes box--button-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>

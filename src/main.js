@@ -4,4 +4,5 @@ Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
+  mode: 'history',
 }).$mount('#app')
