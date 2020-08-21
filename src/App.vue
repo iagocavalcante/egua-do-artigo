@@ -352,7 +352,6 @@ code {
 }
 
 .box--title {
-  width: 22rem;
   margin: auto;
   padding: 1rem;
   font-family: 'Inter', sans-serif;
@@ -361,7 +360,6 @@ code {
 }
 
 .box--subtitle {
-  width: 35rem;
   margin: auto;
   font-family: 'Inter', sans-serif;
   color: #8d8db1;
@@ -374,13 +372,13 @@ code {
   color: #8d8db1;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (min-width: 768px) {
   .box--title {
-    width: 0;
+    width: 22rem;
   }
   
   .box--subtitle {
-    width: 0;
+    width: 35rem;
   }
 }
 
