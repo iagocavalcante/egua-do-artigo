@@ -357,6 +357,7 @@ code {
   padding: 1rem;
   font-family: 'Inter', sans-serif;
   color: #8d8db1;
+  text-align: center;
 }
 
 .box--subtitle {
@@ -373,6 +374,16 @@ code {
   color: #8d8db1;
 }
 
+@media only screen and (max-width: 768px) {
+  .box--title {
+    width: 0;
+  }
+  
+  .box--subtitle {
+    width: 0;
+  }
+}
+
 .box--logo {
   margin: 1rem;
   height: 12rem;
@@ -385,7 +396,7 @@ code {
   font-size: 14pt;
   color: #8d8db1;
   background-color: #f2f2f2;
-  border: none;
+  border: 1px solid;
   border-radius: 2px;
 }
 
