@@ -150,6 +150,7 @@ pre {
   background: rgb(242, 242, 242) none repeat scroll 0% 0%;
   padding: 20px;
   color: rgb(41, 41, 41);
+  overflow-x: auto;
 }
 
 /* ##################################################################################
