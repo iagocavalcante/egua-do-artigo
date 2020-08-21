@@ -3,7 +3,7 @@
     <h1 v-if="!isLoaded" class="box--title">Égua do Artigo</h1>
     <h4 v-if="!isLoaded" class="box--subtitle">
       Com o <b>Égua do Artigo</b> você pode ler os artigos do **dium sem paywall,
-      é grátis e <a class="box--link" href="github.com/iagocavalcante/medium/" target="_blank">open source</a>.
+      é grátis e <a class="box--link" href="https://github.com/iagocavalcante/medium/" target="_blank">open source</a>.
       Venha dar sugestões e ajude a evoluir!
     </h4>
     <div class="box" v-if="!isLoaded">
