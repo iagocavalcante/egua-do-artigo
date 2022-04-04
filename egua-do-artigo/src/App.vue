@@ -2,7 +2,7 @@
   <div id="app" class="bg-primary">
     <div class="flex flex-col items-center space-y-10" v-if="!isLoaded">
       <img :src="require('@/assets/logo.svg')" alt="Égua do artigo logo" />
-      <div class="flex flex-row gap-x-3 w-1/2 justify-center">
+      <div class="flex sm:justify-center items-center sm:flex-row flex-col sm:gap-x-3 gap-y-3 sm:w-1/2 w-full">
         <input class="bg-quaternary w-1/2 outline-1 outline-tertiary text-primary text-opacity-75 rounded-sm h-9 justify-center p-2" type="text" placeholder="Cole aqui o link do artigo" v-model="link"/>
         <button :disabled="isLoading" @click="getArticle()" :class="`w-24 h-9 justify-center rounded-sm bg-quaternary ${isLoading ? 'bg-opacity-75' : ''} text-primary hover:bg-opacity-80`">
           <span v-if="!isLoading"> Ler artigo </span>
@@ -90,7 +90,6 @@ blockquote {
   line-height: 44.4px;
   overflow-wrap: break-word;
   margin: 55px 0 33px 0;
-  /* text-align: center; */
   color: rgba(0, 0, 0, 0.68);
   padding: 0 0 0 50px;
 }
