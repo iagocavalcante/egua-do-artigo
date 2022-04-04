@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'PostComponent',
   props: {
     paragraphs: Array
   },

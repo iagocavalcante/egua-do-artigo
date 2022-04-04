@@ -1,65 +1,56 @@
 <template>
-  <div id="app">
-    <h1 v-if="!isLoaded" class="box--title">Égua do Artigo</h1>
-    <h4 v-if="!isLoaded" class="box--subtitle">
-      Com o <b>Égua do Artigo</b> você pode ler os artigos do **dium sem paywall,
-      é grátis e <a class="box--link" href="https://github.com/iagocavalcante/medium/" target="_blank">open source</a>.
-      Venha dar sugestões e ajude a evoluir!
-    </h4>
-    <div class="box" v-if="!isLoaded">
-      <img class="box--logo" :src="require('@/assets/freedium_logo.svg')" />
-      <input class="box--input" type="text" placeholder="Link do artigo" v-model="link">
-      <button :class="{
-        'box--button-loading': isLoading,
-        }"
-        :disabled="isLoading"
-        class="box--button"
-        @keydown.enter="getArticle()"
-        @click="getArticle()"
-      >
-        <slot v-if="!isLoading">Ler artigo</slot>
-        <span class="box--button-spinner">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </button>
+  <div id="app" class="bg-primary">
+    <div class="flex flex-col items-center space-y-10" v-if="!isLoaded">
+      <img :src="require('@/assets/logo.svg')" alt="Égua do artigo logo" />
+      <div class="flex sm:justify-center items-center sm:flex-row flex-col sm:gap-x-3 gap-y-3 sm:w-1/2 w-full">
+        <input class="bg-quaternary w-1/2 outline-1 outline-tertiary text-primary text-opacity-75 rounded-sm h-9 justify-center p-2" type="text" placeholder="Cole aqui o link do artigo" v-model="link"/>
+        <button :disabled="isLoading" @click="getArticle()" :class="`w-24 h-9 justify-center rounded-sm bg-quaternary ${isLoading ? 'bg-opacity-75' : ''} text-primary hover:bg-opacity-80`">
+          <span v-if="!isLoading"> Ler artigo </span>
+          <div class="flex justify-center w-20 py-3 overflow-hidden" v-if="isLoading">
+            <span class="dot-typing"></span>
+          </div>
+        </button>
+      </div>
     </div>
-    <Post v-if="isLoaded" :paragraphs="paragraphs"/>
+    <PostComponent v-if="isLoaded" :paragraphs="paragraphs"/>
   </div>
 </template>
 
 <script>
-import Post from './components/HelloWorld.vue'
+import PostComponent from './components/PostComponent.vue'
 
 export default {
   name: 'App',
   components: {
-    Post
+    PostComponent
   },
   data: () => ({
-    link: '',
+    link: 'https://medium.com/@neelesh-arora/stop-using-conditional-statements-everywhere-in-javascript-use-an-object-literal-instead-e780debcda18',
     name: 'shamnad.p.s',
     postName: 'image-upload-to-aws-s3-using-nestjs-and-typescript-b32c079963e1',
     isLoading: false,
     isLoaded: false,
-    paragraphs: []
+    paragraphs: [],
+    apiUrl: process.env.VUE_APP_API_URL
   }),
   methods: {
     getArticle () {
-      // const re = /medium\.com\/(?<username>\S+)\/(?<title>\S+)/
-      // const matchedRegex = this.link.match(re)
-      // this.name = matchedRegex['groups'].username
-      // this.postName = matchedRegex['groups'].title
-      this.isLoading = true
       this.isLoaded = false
-        fetch('http://localhost:4000/api/medium?url=https://jessicalexicus.medium.com/vladimir-putin-has-already-won-but-nobody-wants-to-admit-it-523a776c5388')
+      this.isLoading = true
+        fetch(`${this.apiUrl}medium?url=${this.link}?format=json`)
         .then(res => res.json())
         .then(data => {
-          this.paragraphs = [...data.data.html]
+          setTimeout(() => {
+            const {data: { html }} = data
+            this.paragraphs = [...html]
+            this.isLoaded = true
+            this.isLoading = false
+          }, 3000)
+        })
+        .catch(err => {
+          console.log(err)
           this.isLoading = false
-          this.isLoaded = true
+          this.isLoaded = false
         })
     }
   }
@@ -68,7 +59,6 @@ export default {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Lora|Playfair+Display:700i,900');
 
 * {
   font-family: 'Inter', sans-serif;
@@ -80,32 +70,6 @@ body {
   width: 100%;
 }
 
-h1,
-h2,
-p,
-i,
-a,
-.first-letter,
-.authorName a {
-  color: #8d8db1;
-  text-rendering: optimizeLegibility;
-}
-
-h1 {
-  font-size: 48px;
-  text-align: left;
-  margin-bottom: 8px;
-}
-
-h2 {
-  font-size: 26px;
-  font-weight: 700;
-  padding: 0;
-  margin: 56px 0 -13px -1.883px;
-  text-align: left;
-  line-height: 34.5px;
-  letter-spacing: -0.45px;
-}
 
 p, i, a {
   margin-top: 21px;
@@ -126,7 +90,6 @@ blockquote {
   line-height: 44.4px;
   overflow-wrap: break-word;
   margin: 55px 0 33px 0;
-  /* text-align: center; */
   color: rgba(0, 0, 0, 0.68);
   padding: 0 0 0 50px;
 }
@@ -353,163 +316,42 @@ pre {
   width: 100vw;
 }
 
-.box {
-  display: flex;/* shrinks to fit content */
-  flex-direction: column;
-  width: 20rem;
-  margin: auto;
-}
-
-.box--title {
-  margin: auto;
-  padding: 1rem;
-  font-family: 'Inter', sans-serif;
-  color: #8d8db1;
-  text-align: center;
-}
-
-.box--subtitle {
-  margin: auto;
-  font-family: 'Inter', sans-serif;
-  color: #8d8db1;
-  text-align: center;
-}
-
-.box--link {
-  font-size: 12pt;
-  font-family: 'Inter', sans-serif;
-  color: #8d8db1;
-}
-
-@media only screen and (min-width: 768px) {
-  .box--title {
-    width: 22rem;
-  }
-  
-  .box--subtitle {
-    width: 35rem;
-  }
-}
-
-.box--logo {
-  margin: 1rem;
-  height: 12rem;
-}
-
-.box--input {
-  font-family: 'Inter', sans-serif;
-  margin: .7rem;
-  padding: 1.2rem;
-  font-size: 14pt;
-  color: #8d8db1;
-  background-color: #f2f2f2;
-  border: 1px solid;
-  border-radius: 2px;
-}
-
-.box--input:focus {
-  outline: none;
-  border: 1px solid;
-}
-
-.box--button {
-  font-family: 'Inter', sans-serif;
-  margin: .7rem;
-  padding: 1.2rem;
-  font-size: 14pt;
-  color: #f2f2f2;
-  background-color: #8d8db1;
-  border: none;
-  border-radius: 2px;
-}
-
-.box--button:hover {
-  cursor: pointer;
-  color: #f2f2f2;
-  background-color: #8d8db1A6;
-}
-
-.box--button::-moz-focus-inner {
-  border-style: none;
-  padding: 0;
-}
-.box--button:-moz-focusring {
-  outline: 1px dotted ButtonText;
-}
-/* loading styles */
-.box--button {
+.dot-typing {
   position: relative;
-  -webkit-transition: all 0.2s;
-  transition: all 0.2s;
-  transition-timing-function: ease-in;
+  left: -9999px;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: #466551;
+  color: #466551;
+  box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 #466551, 10029px 0 0 0 #466551;
+  animation: dotTyping 1.5s infinite linear;
 }
-.box--button-spinner {
-  position: relative;
-  justify-content: center;
-  opacity: 0;
-  transition-property: padding, opacity;
-  transition-duration: 0.2s, 0.2s;
-  transition-timing-function: ease-in, ease;
-  transition-delay: 0s, 0.2s;
-}
-.box--button-spinner span {
-  box-sizing: border-box;
-  display: inline-block;
-  position: absolute;
-  width: 2.2rem;
-  height: 2.2rem;
-  opacity: 1;
-  border: 3.4px solid #f2f2f2;
-  border-radius: 50%;
-  animation: box--button-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #f2f2f2 transparent transparent transparent;
-}
-.box--button-spinner span:nth-child(1) {
-  animation-delay: 0.45s;
-}
-.box--button-spinner span:nth-child(2) {
-  animation-delay: 0.3s;
-}
-.box--button-spinner span:nth-child(3) {
-  animation-delay: 0.15s;
-}
-.box--button-loading {
-  padding-right: 3.5rem;
-}
-.box--button-loading .box--button-spinner {
-  opacity: 1;
-  padding: 1.2rem;
-}
-.box--button-loading .box--button-spinner span {
-  opacity: 1;
-}
-button:not(:disabled) {
-  transition-delay: 0.2s;
-}
-button:not(:disabled) .box--button-spinner span {
-  box-shadow: 0 0 0 0.2rem #f2f2f2 inset;
-  border: 7.4px solid transparent;
-  -webkit-transition: all 0.4s;
-  transition: all 0.4s;
-}
-button:not(:disabled) .box--button-spinner span:nth-child(1) {
-  transform: rotate(0deg);
-}
-button:not(:disabled) .box--button-spinner span:nth-child(2) {
-  transform: rotate(90deg);
-}
-button:not(:disabled) .box--button-spinner span:nth-child(3) {
-  transform: rotate(180deg);
-}
-button:not(:disabled) .box--button-spinner span:nth-child(4) {
-  transform: rotate(270deg);
-}
-@keyframes box--button-spinner {
+
+@keyframes dotTyping {
   0% {
-    transform: rotate(0deg);
+    box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 , 10029px 0 0 0 #466551;
+  }
+  14.286% {
+    box-shadow: 9984px -10px 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 , 10029px 0 0 0 #466551;
+  }
+  28.568% {
+    box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 , 10029px 0 0 0 #466551;
+  }
+  42.852% {
+    box-shadow: 9984px 0 0 0 #466551, 9999px -10px 0 0 #466551, 10014px 0 0 0 , 10029px 0 0 0 #466551;
+  }
+  57.136% {
+    box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 , 10029px 0 0 0 #466551;
+  }
+  71.42% {
+    box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px -10px 0 0 , 10029px 0 0 0 #466551;
+  }
+  85.704% {
+    box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 , 10029px 0 0 0 #466551;
   }
   100% {
-    transform: rotate(360deg);
+    box-shadow: 9984px 0 0 0 #466551, 9999px 0 0 0 #466551, 10014px 0 0 0 , 10029px -10px 0 0 #466551;
   }
 }
 </style>
